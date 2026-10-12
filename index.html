@@ -282,7 +282,7 @@ button.pill:hover{filter:brightness(.97)}
 <div class="sheet-bg" id="rq-bg" hidden>
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="rq-title" dir="rtl">
     <div class="sheet-h"><h2 id="rq-title">שליחה ל-Claude</h2><button class="x" type="button" id="rq-close" aria-label="סגירה">×</button></div>
-    <p class="lead">רעיון לשיפור האפליקציה, או רשימת משימות שצריך להכניס. הבקשות נשמרות כאן, ובעל/ת האפליקציה מעביר/ה אותן ל-Claude.</p>
+    <p class="lead">רעיון לשיפור האפליקציה, או רשימת משימות שצריך להכניס. הבקשה מגיעה לבעל/ת האפליקציה, שמעביר/ה אותה ל-Claude.</p>
     <form id="rq-form" autocomplete="off">
       <div class="rq-types" role="group" aria-label="סוג הבקשה">
         <button type="button" class="rq-type" data-rqtype="ui" aria-pressed="true"><b>שיפור לממשק</b><small>משהו שחסר, לא נוח או לא עובד</small></button>
@@ -291,8 +291,15 @@ button.pill:hover{filter:brightness(.97)}
       <textarea class="rq-text" id="rq-text" maxlength="5000" aria-label="תוכן הבקשה"></textarea>
       <div class="rq-row"><span class="hint" id="rq-hint"></span><button class="btn" type="submit">שליחה</button></div>
     </form>
-    <section class="rq-sec">
-      <h3>בקשות שנשלחו <small id="rq-total"></small></h3>
+    <div class="rq-sec" id="rq-login">
+      <button class="linkbtn" type="button" id="rq-login-open">כניסת מנהל</button>
+      <form class="rq-row" id="rq-login-form" hidden autocomplete="off">
+        <input id="rq-code" type="password" inputmode="text" placeholder="קוד מנהל" aria-label="קוד מנהל" style="flex:1;min-width:0;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 12px">
+        <button class="btn small" type="submit">כניסה</button>
+      </form>
+    </div>
+    <section class="rq-sec" id="rq-admin" hidden>
+      <h3>בקשות שנשלחו <small id="rq-total"></small><button class="linkbtn" type="button" id="rq-logout" style="margin-inline-start:auto;font-size:13px">יציאה</button></h3>
       <div class="rq-tabs" id="rq-tabs"></div>
       <div class="rq-list" id="rq-list"></div>
       <div class="rq-row" id="rq-tools"></div>
@@ -304,6 +311,7 @@ button.pill:hover{filter:brightness(.97)}
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="firebase-config.js"></script>
 <script>
 (function(){
@@ -650,7 +658,8 @@ setInterval(()=>{ if(!document.hidden) render() }, 60000); // refresh "x minutes
 
 
 /* ---------- requests to Claude ---------- */
-const RQ = { type:'ui', tab:'new', items:[] };
+const ADMIN_EMAIL = 'admin@alina.local';
+const RQ = { type:'ui', tab:'new', items:[], admin:false, unsub:null };
 const RQ_TYPE = { ui:'שיפור לממשק', tasks:'רשימת משימות' };
 const RQ_ST = { new:'חדש', sent:'הועבר ל-Claude', done:'טופל' };
 const RQ_PH = { ui:'למשל: הייתי רוצה לראות את המשימות לפי תאריך…', tasks:'למשל:\nלהזמין מדבקות עם הלוגו – דנה\nלצלם את החנות לאינסטגרם\nלבדוק מזגן – עד 1.11' };
@@ -660,6 +669,23 @@ function rqSetType(t){ RQ.type=t; document.querySelectorAll('[data-rqtype]').for
 function rqOpen(){ $('#rq-bg').hidden=false; document.body.style.overflow='hidden'; rqSetType(RQ.type); renderRq(); setTimeout(()=>$('#rq-text').focus(),50) }
 function rqClose(){ $('#rq-bg').hidden=true; document.body.style.overflow=''; $('#rq-copybox').hidden=true; $('#fab').focus() }
 $('#fab').addEventListener('click', rqOpen);
+function rqSubscribe(on){
+  if(RQ.unsub){ RQ.unsub(); RQ.unsub=null }
+  RQ.items=[];
+  if(on && S.db) RQ.unsub=S.db.collection('requests').orderBy('createdAt').limit(500).onSnapshot(snap=>{ RQ.items=snap.docs.map(d=>({id:d.id,...d.data()})).reverse(); renderRq() }, ()=>{ toast('אין הרשאה לראות את הבקשות'); });
+  renderRq();
+}
+function rqSetAdmin(v){ RQ.admin=v; rqSubscribe(v) }
+$('#rq-login-open').addEventListener('click',()=>{ $('#rq-login-form').hidden=false; $('#rq-login-open').hidden=true; $('#rq-code').focus() });
+$('#rq-login-form').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const code=$('#rq-code').value.trim(); if(!code) return;
+  if(S.demo){ rqSetAdmin(true); return }
+  if(!window.firebase || !firebase.auth){ toast('הכניסה לא זמינה כרגע. רעננו את הדף.'); return }
+  try{ await firebase.auth().signInWithEmailAndPassword(ADMIN_EMAIL, code); $('#rq-code').value=''; toast('נכנסת כמנהל') }
+  catch(err){ const c=err&&err.code||''; toast(/wrong-password|invalid-credential|invalid-login|user-not-found/.test(c)? 'הקוד שגוי' : /too-many/.test(c)? 'יותר מדי ניסיונות. נסו שוב מאוחר יותר.' : 'הכניסה לא הצליחה. נסו שוב.') }
+});
+$('#rq-logout').addEventListener('click', async()=>{ if(!S.demo && window.firebase && firebase.auth) await firebase.auth().signOut().catch(()=>{}); rqSetAdmin(false); $('#rq-login-form').hidden=true; $('#rq-login-open').hidden=false; toast('יצאת ממצב מנהל') });
 $('#rq-close').addEventListener('click', rqClose);
 $('#rq-bg').addEventListener('click', e=>{ if(e.target.id==='rq-bg') rqClose() });
 document.addEventListener('keydown', e=>{ if(e.key==='Escape' && !$('#rq-bg').hidden) rqClose() });
@@ -682,9 +708,11 @@ function rqCopyText(list){
   return out.join('\n');
 }
 function renderRq(){
-  const n=RQ.items.filter(r=>(r.status||'new')==='new').length;
+  const n=RQ.admin? RQ.items.filter(r=>(r.status||'new')==='new').length : 0;
   const fc=$('#fab-count'); fc.hidden=!n; fc.textContent=n;
-  if($('#rq-bg').hidden) return;
+  $('#rq-admin').hidden=!RQ.admin; $('#rq-login').hidden=RQ.admin;
+  $('#rq-form').querySelector('.btn').textContent='שליחה';
+  if($('#rq-bg').hidden || !RQ.admin) return;
   $('#rq-total').textContent=RQ.items.length||'';
   const cnt=k=>k==='all'?RQ.items.length:RQ.items.filter(r=>(r.status||'new')===k).length;
   const tabs=[['new','חדשות'],['sent','הועברו'],['done','טופלו'],['all','הכל']];
@@ -769,7 +797,8 @@ function localDb(){
     S.comments=m; render();
   }, onErr);
   db.doc('meta/settings').onSnapshot(s=>{ S.settings=s.exists? {...s.data()} : {}; renderHeader() }, onErr);
-  db.collection('requests').orderBy('createdAt').limit(500).onSnapshot(snap=>{ RQ.items=snap.docs.map(d=>({id:d.id,...d.data()})).reverse(); renderRq() }, ()=>{});
+  if(!S.demo && firebase.auth) firebase.auth().onAuthStateChanged(u=>rqSetAdmin(!!u && u.email===ADMIN_EMAIL));
+  renderRq();
 })();
 })();
 </script>

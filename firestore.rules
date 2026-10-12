@@ -1,8 +1,17 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if true;
+    // Requests: anyone can send one; only the admin can read or change them.
+    match /requests/{id} {
+      allow create: if request.resource.data.status == 'new'
+        && request.resource.data.text is string
+        && request.resource.data.text.size() <= 5000;
+      allow read, update, delete: if request.auth != null
+        && request.auth.token.email == 'admin@alina.local';
+    }
+    // Tasks, comments and settings: open to everyone with the link.
+    match /{coll}/{id} {
+      allow read, write: if coll != 'requests';
     }
   }
 }
