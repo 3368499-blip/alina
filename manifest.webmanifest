@@ -1,0 +1,15 @@
+{
+  "name": "אלינה · פתיחת החנות",
+  "short_name": "אלינה",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "dir": "rtl",
+  "lang": "he",
+  "background_color": "#F3F1ED",
+  "theme_color": "#EFE8DA",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
+  ]
+}

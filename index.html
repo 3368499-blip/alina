@@ -1,0 +1,647 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#EFE8DA">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-title" content="אלינה">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>אלינה · פתיחת החנות</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&family=Secular+One&display=swap">
+<style>
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+/* Layout: sticky header (logo + countdown + progress), composer card, filter bar, then two task sections (open / done). One column, max 760px. */
+:root{
+  --bg:#F3F1ED; --surface:#FFFFFF; --surface-2:#F7F5F1; --ink:#2B241B; --muted:#6F665A; --line:#E0D9CE;
+  --brand:#7A5F36; --brand-soft:#F1E8D8; --accent:#B8975F; --accent-ink:#2B1D07; --accent-soft:#F5ECDC;
+  --plate:#EFE8DA; --plate-line:#E2D6C0;
+  --done:#3E8A5E; --done-soft:#E1EFE5; --danger:#B4432F; --danger-soft:#F7E3DE;
+  --cat-general:#6B7C76; --cat-legal:#7357B8; --cat-build:#B8612F; --cat-supply:#2F7FB8; --cat-tech:#0F8A8A; --cat-team:#B8417A; --cat-marketing:#8C8A1E;
+  --shadow:0 1px 2px rgba(43,36,27,.06),0 4px 14px rgba(43,36,27,.06);
+  --f-display:"Secular One","Assistant","Arial Hebrew",system-ui,sans-serif;
+  --f-body:"Assistant","Arial Hebrew","Segoe UI",system-ui,sans-serif;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#14110D; --surface:#1E1A15; --surface-2:#25201A; --ink:#EFE9DF; --muted:#A99F90; --line:#3A3228;
+  --brand:#D9BC8A; --brand-soft:#33291C; --accent:#D2AE70; --accent-ink:#21170A; --accent-soft:#3A2E1C;
+  --plate:#EFE8DA; --plate-line:#D9CBB0;
+  --done:#5CC28A; --done-soft:#1A3326; --danger:#EE7A64; --danger-soft:#3B201A;
+  --cat-general:#9AAAA4; --cat-legal:#A58DEA; --cat-build:#E5915F; --cat-supply:#6CB3E8; --cat-tech:#4CC8C8; --cat-team:#E57BAE; --cat-marketing:#C9C65A;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25); color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#14110D; --surface:#1E1A15; --surface-2:#25201A; --ink:#EFE9DF; --muted:#A99F90; --line:#3A3228;
+  --brand:#D9BC8A; --brand-soft:#33291C; --accent:#D2AE70; --accent-ink:#21170A; --accent-soft:#3A2E1C;
+  --plate:#EFE8DA; --plate-line:#D9CBB0;
+  --done:#5CC28A; --done-soft:#1A3326; --danger:#EE7A64; --danger-soft:#3B201A;
+  --cat-general:#9AAAA4; --cat-legal:#A58DEA; --cat-build:#E5915F; --cat-supply:#6CB3E8; --cat-tech:#4CC8C8; --cat-team:#E57BAE; --cat-marketing:#C9C65A;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25); color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5}
+.app{max-width:760px;margin:0 auto;padding-inline:16px;padding-block:0 96px}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+svg{flex:none}
+
+/* header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);padding-block:14px 12px;margin-inline:-16px;padding-inline:16px;border-bottom:1px solid transparent;transition:border-color .2s}
+.top.scrolled{border-bottom-color:var(--line)}
+.logo{background:var(--plate);border-radius:18px;display:flex;justify-content:center;align-items:center;padding:14px 20px;box-shadow:inset 0 0 0 1px var(--plate-line);transition:padding .25s}
+.logo img{height:84px;width:auto;max-width:100%;display:block;transition:height .25s}
+.top.scrolled .logo{padding:6px 14px}
+.top.scrolled .logo img{height:40px}
+.titles{min-width:0;margin-top:12px;display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 14px}
+h1{font-family:var(--f-display);font-weight:400;font-size:clamp(26px,6vw,34px);line-height:1.1;margin:0;text-wrap:balance}
+.countdown{display:flex;align-items:center;gap:8px;flex-wrap:wrap;color:var(--muted);font-size:15px}
+.countdown b{color:var(--ink);font-variant-numeric:tabular-nums}
+.linkbtn{background:none;border:0;padding:0;color:var(--brand);font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.datepick{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:2px 8px}
+.progress{margin-top:12px;display:flex;align-items:center;gap:12px}
+.bar{flex:1;height:10px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--done);border-radius:99px;transition:width .5s cubic-bezier(.3,.7,.3,1)}
+.pct{font-weight:800;font-variant-numeric:tabular-nums;font-size:15px;white-space:nowrap}
+.whoami{display:flex;align-items:center;gap:6px;margin-top:10px;font-size:14px;color:var(--muted)}
+.whoami input{border:1px dashed var(--line);background:transparent;border-radius:99px;padding:3px 12px;width:150px;font-weight:700;color:var(--ink)}
+.whoami input:not(:placeholder-shown){border-style:solid;background:var(--surface)}
+
+/* notices */
+.notice{margin-top:14px;padding:12px 14px;border-radius:12px;background:var(--accent-soft);color:var(--ink);font-size:15px}
+.allset{margin-top:14px;padding:14px;border-radius:12px;background:var(--done-soft);display:flex;gap:10px;align-items:center;font-weight:700}
+
+/* composer */
+.composer{margin-top:14px;background:var(--surface);border-radius:var(--r);box-shadow:var(--shadow);padding:12px}
+.addrow{display:flex;gap:8px}
+.addrow input{flex:1;min-width:0;border:0;background:var(--surface-2);border-radius:10px;padding:12px 14px;font-size:17px}
+.btn{border:0;border-radius:10px;padding:10px 16px;font-weight:700;background:var(--brand);color:var(--surface);display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.small{padding:6px 12px;font-size:14px}
+.opts{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.field{display:flex;align-items:center;gap:6px;background:var(--surface-2);border-radius:10px;padding:4px 10px;color:var(--muted);font-size:14px;min-width:0}
+.field input,.field select{border:0;background:transparent;padding:4px 0;color:var(--ink);font-size:15px;min-width:0}
+.field input[type=text]{width:130px}
+.urgent-toggle{display:flex;align-items:center;gap:6px;background:var(--surface-2);border-radius:10px;padding:4px 12px;font-size:14px;color:var(--muted);cursor:pointer;user-select:none}
+.urgent-toggle input{accent-color:var(--danger)}
+
+/* filters */
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:16px}
+.seg{display:flex;background:var(--surface);border-radius:99px;padding:3px;box-shadow:var(--shadow);overflow-x:auto;max-width:100%}
+.seg button{border:0;background:transparent;border-radius:99px;padding:6px 14px;font-weight:700;font-size:14px;color:var(--muted);white-space:nowrap}
+.seg button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+.seg button small{font-weight:600;opacity:.75;margin-inline-start:4px;font-variant-numeric:tabular-nums}
+.search{flex:1;min-width:150px;display:flex;align-items:center;gap:6px;background:var(--surface);border-radius:99px;padding:6px 14px;box-shadow:var(--shadow);color:var(--muted)}
+.search input{border:0;background:transparent;flex:1;min-width:0;color:var(--ink)}
+.search input:focus{outline:none}
+.catbar{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.catchip{border:1px solid var(--line);background:transparent;border-radius:99px;padding:3px 12px;font-size:13px;font-weight:600;color:var(--muted);display:inline-flex;align-items:center;gap:6px}
+.catchip[aria-pressed=true]{border-color:var(--ink);color:var(--ink);background:var(--surface)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--c)}
+
+/* sections */
+.section-h{display:flex;align-items:baseline;gap:8px;margin:22px 0 10px;font-family:var(--f-display);font-weight:400;font-size:20px}
+.section-h small{font-family:var(--f-body);font-weight:700;font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+.section-h .linkbtn{margin-inline-start:auto;font-family:var(--f-body);font-size:14px}
+.list{display:flex;flex-direction:column;gap:10px}
+
+/* task card */
+.task{background:var(--surface);border-radius:var(--r);box-shadow:var(--shadow);display:grid;grid-template-columns:auto 1fr;gap:4px 12px;padding:14px;border-inline-start:4px solid var(--c,var(--line));position:relative}
+.task.enter{animation:pop .35s cubic-bezier(.2,.8,.3,1.2)}
+@keyframes pop{from{transform:scale(.97);opacity:.4}to{transform:none;opacity:1}}
+.task.is-done{background:var(--surface-2);box-shadow:none}
+.task.is-done .ttl{text-decoration:line-through;text-decoration-color:var(--muted);color:var(--muted)}
+.check{appearance:none;width:30px;height:30px;border-radius:9px;border:2.5px solid var(--muted);background:var(--surface);margin:1px 0 0;cursor:pointer;display:grid;place-items:center;transition:background .15s,border-color .15s,transform .15s}
+.check:hover{border-color:var(--done)}
+.check:checked{background:var(--done);border-color:var(--done)}
+.check:checked::after{content:"";width:9px;height:16px;border:solid var(--surface);border-width:0 3.5px 3.5px 0;transform:translateY(-2px) rotate(45deg)}
+.check:active{transform:scale(.9)}
+.check:disabled{cursor:default;opacity:.7}
+.tbody{min-width:0}
+.ttl{font-size:17px;font-weight:700;line-height:1.35;overflow-wrap:anywhere}
+.meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;align-items:center}
+.pill{display:inline-flex;align-items:center;gap:5px;border-radius:99px;padding:3px 10px;font-size:13px;font-weight:700;background:var(--surface-2);color:var(--muted);border:0;max-width:100%}
+.task.is-done .pill{background:var(--surface)}
+.pill.who{background:var(--brand-soft);color:var(--brand)}
+.pill.who.none{background:transparent;border:1px dashed var(--line);color:var(--muted)}
+.pill.cat{color:var(--c)}
+.pill.urgent{background:var(--danger-soft);color:var(--danger)}
+.pill.late{background:var(--danger-soft);color:var(--danger)}
+.pill.soon{background:var(--accent-soft);color:var(--ink)}
+.pill.donepill{background:var(--done-soft);color:var(--done)}
+.pill span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+button.pill:hover{filter:brightness(.97)}
+.actions{grid-column:2;display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;margin-inline-start:-8px}
+.act{border:0;background:transparent;border-radius:8px;padding:5px 8px;font-size:14px;font-weight:600;color:var(--muted);display:inline-flex;align-items:center;gap:5px}
+.act:hover{background:var(--surface-2);color:var(--ink)}
+.act.claim{color:var(--brand)}
+.act.del:hover{color:var(--danger);background:var(--danger-soft)}
+.act .count{background:var(--accent);color:var(--accent-ink);border-radius:99px;padding:0 7px;font-size:12px;font-weight:800;font-variant-numeric:tabular-nums}
+
+/* comments */
+.comments{grid-column:1 / -1;margin-top:8px;border-top:1px solid var(--line);padding-top:10px;display:flex;flex-direction:column;gap:8px}
+.cm{background:var(--surface-2);border-radius:12px;padding:8px 12px;min-width:0}
+.task.is-done .cm{background:var(--surface)}
+.cm-h{display:flex;gap:8px;align-items:baseline;font-size:13px;color:var(--muted)}
+.cm-h b{color:var(--ink)}
+.cm-h button{margin-inline-start:auto;border:0;background:none;color:var(--muted);font-size:12px;padding:0}
+.cm-h button:hover{color:var(--danger)}
+.cm p{margin:2px 0 0;white-space:pre-wrap;overflow-wrap:anywhere}
+.cm-form{display:flex;gap:8px}
+.cm-form input{flex:1;min-width:0;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 12px}
+.empty-cm{font-size:14px;color:var(--muted)}
+
+/* edit form */
+.edit{grid-column:1 / -1;display:flex;flex-direction:column;gap:10px}
+.edit .ttl-in{border:1px solid var(--line);background:var(--surface-2);border-radius:10px;padding:10px 12px;font-size:17px;font-weight:700;width:100%}
+.edit .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+
+/* empty state */
+.empty{text-align:center;padding:36px 16px;color:var(--muted);background:var(--surface);border-radius:var(--r);border:2px dashed var(--line)}
+.empty h3{font-family:var(--f-display);font-weight:400;color:var(--ink);font-size:22px;margin:0 0 6px}
+.empty p{margin:0 auto 14px;max-width:42ch}
+
+/* toast */
+.toast{position:fixed;inset-inline:0;bottom:calc(18px + env(safe-area-inset-bottom,0px));display:flex;justify-content:center;pointer-events:none;z-index:50;padding-inline:16px}
+.toast div{background:var(--ink);color:var(--bg);border-radius:12px;padding:10px 16px;font-weight:600;display:flex;gap:14px;align-items:center;box-shadow:0 8px 24px rgba(0,0,0,.25);pointer-events:auto;transform:translateY(20px);opacity:0;transition:.25s}
+.toast div.show{transform:none;opacity:1}
+.toast button{background:none;border:0;color:var(--accent);font-weight:800;padding:0}
+@media (max-width:480px){
+  .logo img{height:64px}
+  .field input[type=text]{width:110px}
+  .addrow .btn span{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+</head>
+<body>
+<div class="app" dir="rtl" lang="he">
+  <header class="top" id="top">
+    <div class="logo" id="logo"><img src="" alt="אלינה" id="logo-img"></div>
+    <div class="titles">
+      <h1>פתיחת החנות</h1>
+      <div class="countdown" id="countdown"></div>
+    </div>
+    <div class="progress" aria-label="התקדמות">
+      <div class="bar"><i id="barfill"></i></div>
+      <div class="pct" id="pct">0 מתוך 0</div>
+    </div>
+  </header>
+
+  <div class="whoami">
+    <label for="myname">השם שלי:</label>
+    <input id="myname" type="text" placeholder="כתבו את השם שלכם" maxlength="30" autocomplete="name">
+  </div>
+
+  <div id="notices"></div>
+
+  <form class="composer" id="composer" autocomplete="off">
+    <div class="addrow">
+      <input id="new-title" type="text" placeholder="מה צריך לעשות לפני הפתיחה?" maxlength="200" aria-label="משימה חדשה">
+      <button class="btn" type="submit" id="add-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg><span>הוספה</span>
+      </button>
+    </div>
+    <div class="opts">
+      <label class="field" for="new-who">מבצע/ת
+        <input id="new-who" type="text" list="people" placeholder="מי?" maxlength="40">
+      </label>
+      <label class="field" for="new-cat">תחום
+        <select id="new-cat"></select>
+      </label>
+      <label class="field" for="new-due">עד
+        <input id="new-due" type="date">
+      </label>
+      <label class="urgent-toggle" for="new-urgent"><input id="new-urgent" type="checkbox"> דחוף</label>
+    </div>
+  </form>
+  <datalist id="people"></datalist>
+
+  <div class="filters">
+    <div class="seg" role="group" aria-label="סינון" id="seg"></div>
+    <label class="search" for="q">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="חיפוש משימה או שם">
+    </label>
+  </div>
+  <div class="catbar" id="catbar"></div>
+
+  <main id="main"></main>
+</div>
+<div class="toast" aria-live="polite"><div id="toast"></div></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script>
+(function(){
+document.documentElement.lang='he';document.documentElement.dir='rtl';
+
+/* ---------- constants ---------- */
+const LOGO_SRC = "logo.png";
+const CATS = [
+  {id:'general',name:'כללי'},
+  {id:'legal',name:'רישוי ובירוקרטיה'},
+  {id:'build',name:'שיפוץ ועיצוב'},
+  {id:'supply',name:'ספקים ומלאי'},
+  {id:'tech',name:'קופה וטכנולוגיה'},
+  {id:'team',name:'צוות'},
+  {id:'marketing',name:'שיווק ופתיחה'},
+];
+const CAT = Object.fromEntries(CATS.map(c=>[c.id,c]));
+const STARTER = [
+  ['חתימה על חוזה שכירות','legal'],['הוצאת רישיון עסק','legal'],['פתיחת תיק במע״מ ובמס הכנסה','legal'],['ביטוח לעסק','legal'],
+  ['צביעה ותאורה','build'],['הזמנת שלט לחזית','build'],['סידור מדפים ותצוגה','build'],
+  ['בחירת ספקים והזמנה ראשונה','supply'],['קליטת מלאי ותמחור','supply'],
+  ['התקנת קופה ומסוף אשראי','tech'],['חיבור אינטרנט וטלפון','tech'],
+  ['גיוס עובדים','team'],['הדרכת צוות','team'],
+  ['פתיחת עמוד אינסטגרם ופייסבוק','marketing'],['תכנון אירוע פתיחה','marketing'],
+];
+const I = {
+  user:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>',
+  cal:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>',
+  chat:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg>',
+  flag:'<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3h2v18H5zM8 4h11l-2.5 4.5L19 13H8z"/></svg>',
+  edit:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>',
+  trash:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>',
+  hand:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13V5.5a1.5 1.5 0 0 1 3 0V11m0-1.5V4a1.5 1.5 0 0 1 3 0v6m0-4.5a1.5 1.5 0 0 1 3 0V13a7 7 0 0 1-7 7h-.5a6 6 0 0 1-5-2.7L3 13.5a1.5 1.5 0 0 1 2.5-1.6L8 15"/></svg>',
+  check:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>',
+  party:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 21l5-14 9 9z"/><path d="M14 4l1 2M19 3l-1 3M20 9l-2 1M12 8l3-3"/></svg>',
+};
+
+/* ---------- state ---------- */
+const ls = { get(k){try{return localStorage.getItem(k)}catch(e){return null}}, set(k,v){try{localStorage.setItem(k,v)}catch(e){}} };
+const S = {
+  db:null, myId:null, readOnly:false, noDb:false, demo:false, ready:false,
+  tasks:new Map(), comments:new Map(), settings:{},
+  filter: ls.get('filter') || 'open', cat:'all', q:'',
+  open:new Set(), editing:null, drafts:{}, pickDate:false, showDone: ls.get('showDone')!=='0',
+  seen:new Set(), myName: ls.get('myName') || '',
+};
+const $ = s=>document.querySelector(s);
+const esc = s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const norm = s=>String(s||'').trim().toLowerCase();
+const isMine = t=>S.myName && norm(t.assignee)===norm(S.myName);
+
+/* ---------- dates ---------- */
+const DAY=864e5;
+const today0 = ()=>{const d=new Date();d.setHours(0,0,0,0);return d};
+const parseDay = s=>{ if(!s) return null; const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d) };
+const fmtDay = s=>{ const d=parseDay(s); return d? new Intl.DateTimeFormat('he-IL',{day:'numeric',month:'short'}).format(d):'' };
+const daysTo = s=>{ const d=parseDay(s); return d? Math.round((d-today0())/DAY):null };
+const rtf = new Intl.RelativeTimeFormat('he',{numeric:'auto'});
+function ago(ts){
+  const s=(ts-Date.now())/1000, a=Math.abs(s);
+  if(a<45) return 'עכשיו';
+  if(a<3600) return rtf.format(Math.round(s/60),'minute');
+  if(a<86400) return rtf.format(Math.round(s/3600),'hour');
+  if(a<86400*7) return rtf.format(Math.round(s/86400),'day');
+  return new Intl.DateTimeFormat('he-IL',{day:'numeric',month:'short'}).format(new Date(ts));
+}
+
+/* ---------- toast ---------- */
+let toastT;
+function toast(msg, undo){
+  const el=$('#toast'); clearTimeout(toastT);
+  el.innerHTML=''; const sp=document.createElement('span'); sp.textContent=msg; el.append(sp);
+  if(undo){ const b=document.createElement('button'); b.textContent='ביטול'; b.onclick=()=>{el.classList.remove('show');undo()}; el.append(b) }
+  el.classList.add('show'); toastT=setTimeout(()=>el.classList.remove('show'), undo?6000:2600);
+}
+
+/* ---------- writes ---------- */
+async function write(fn, okMsg){
+  if(!S.db){ toast('אין חיבור לשמירה. בדקו את החיבור לאינטרנט ונסו שוב.'); return false }
+  for(let i=0;i<2;i++){
+    try{ await fn(); if(okMsg) toast(okMsg); return true }
+    catch(e){
+      const c=e&&e.code;
+      if(c==='unavailable' && i===0){ await new Promise(r=>setTimeout(r,400+Math.random()*600)); continue }
+      if(c==='permission-denied') toast('השרת סירב לשמור. בדקו את הגדרות ההרשאות ב-Firebase.');
+      else if(c==='resource-exhausted') toast('הגעתם למכסה היומית של Firebase. נסו שוב מחר.');
+      else toast('השמירה לא הצליחה. נסו שוב בעוד רגע.');
+      return false;
+    }
+  }
+}
+const tasksCol = ()=>S.db.collection('tasks');
+const commentsCol = ()=>S.db.collection('comments');
+
+function needName(){
+  if(S.myName) return false;
+  toast('כתבו קודם את השם שלכם למעלה'); const n=$('#myname'); n.focus(); n.scrollIntoView({block:'center',behavior:'smooth'}); return true;
+}
+
+/* ---------- static controls ---------- */
+$('#new-cat').innerHTML = CATS.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');
+const nameIn=$('#myname'); nameIn.value=S.myName;
+nameIn.addEventListener('change',()=>{ S.myName=nameIn.value.trim(); nameIn.value=S.myName; ls.set('myName',S.myName); if(S.myName) toast('שלום '+S.myName+'!'); render() });
+$('#q').addEventListener('input',e=>{ S.q=e.target.value; render() });
+
+$('#composer').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const title=$('#new-title').value.trim(); if(!title){ $('#new-title').focus(); return }
+  const data={ title, assignee:$('#new-who').value.trim(), category:$('#new-cat').value, due:$('#new-due').value||'', urgent:$('#new-urgent').checked,
+    done:false, doneBy:'', doneAt:0, createdAt:Date.now(), createdBy:S.myName||'' };
+  const ok = await write(()=>tasksCol().doc().set(data), 'המשימה נוספה');
+  if(ok){ $('#new-title').value=''; $('#new-due').value=''; $('#new-urgent').checked=false; $('#new-title').focus();
+    if(S.filter==='done'||(S.filter==='mine'&&!isMine(data))){ S.filter='open'; render() } }
+});
+
+/* ---------- render ---------- */
+function visible(){
+  const q=norm(S.q);
+  return [...S.tasks.values()].filter(t=>{
+    if(S.cat!=='all' && (t.category||'general')!==S.cat) return false;
+    if(S.filter==='mine' && !isMine(t)) return false;
+    if(S.filter==='open' && t.done) return false;
+    if(S.filter==='done' && !t.done) return false;
+    if(q && !(norm(t.title).includes(q)||norm(t.assignee).includes(q))) return false;
+    return true;
+  });
+}
+const byOpen=(a,b)=>(b.urgent-a.urgent)|| ((a.due||'9999')<(b.due||'9999')?-1:(a.due||'9999')>(b.due||'9999')?1:0) || (a.createdAt-b.createdAt);
+const byDone=(a,b)=>(b.doneAt||0)-(a.doneAt||0);
+
+function render(){
+  renderHeader(); renderFilters(); renderMain();
+}
+
+function renderHeader(){
+  const all=[...S.tasks.values()], done=all.filter(t=>t.done).length;
+  $('#barfill').style.width = all.length? (done/all.length*100)+'%' : '0';
+  $('#pct').textContent = all.length? `${done} מתוך ${all.length} בוצעו` : 'אין עדיין משימות';
+  
+
+  const cd=$('#countdown'); const od=S.settings.openingDate;
+  if(S.pickDate){
+    if(!cd.querySelector('input')){
+      cd.innerHTML=`<label for="open-date">תאריך הפתיחה:</label> <input class="datepick" id="open-date" type="date" value="${esc(od||'')}"> <button class="linkbtn" data-act="cancel-date" type="button">סגירה</button>`;
+      const inp=cd.querySelector('input'); inp.focus();
+      inp.addEventListener('change',async()=>{ const v=inp.value; S.pickDate=false;
+        await write(()=>S.db.doc('meta/settings').set({...S.settings, openingDate:v}), v?'תאריך הפתיחה נשמר':'תאריך הפתיחה הוסר'); renderHeader() });
+    }
+    return;
+  }
+  let html;
+  if(od){
+    const n=daysTo(od);
+    const when = n>1? `עוד <b>${n}</b> ימים לפתיחה` : n===1? '<b>מחר</b> פותחים!' : n===0? '<b>היום</b> פותחים!' : `החנות פתוחה כבר <b>${-n}</b> ימים`;
+    html = `<span>${when}</span><span aria-hidden="true">·</span><span>${esc(fmtDay(od))}</span>`+(S.readOnly||!S.db?'':` <button class="linkbtn" type="button" data-act="pick-date">שינוי</button>`);
+  } else {
+    html = S.readOnly||!S.db? '<span>תאריך הפתיחה עוד לא נקבע</span>' : `<button class="linkbtn" type="button" data-act="pick-date">קביעת תאריך פתיחה</button>`;
+  }
+  if(cd.dataset.h!==html){ cd.innerHTML=html; cd.dataset.h=html }
+}
+
+function renderFilters(){
+  const all=[...S.tasks.values()];
+  const n={ open:all.filter(t=>!t.done).length, mine:all.filter(t=>isMine(t)&&!t.done).length, done:all.filter(t=>t.done).length, all:all.length };
+  const opts=[['open','לביצוע'],['mine','שלי'],['done','בוצעו'],['all','הכל']];
+  const html=opts.map(([k,l])=>`<button type="button" data-filter="${k}" aria-pressed="${S.filter===k}">${l}<small>${n[k]}</small></button>`).join('');
+  const seg=$('#seg'); if(seg.dataset.h!==html){ seg.innerHTML=html; seg.dataset.h=html }
+  const used=new Set(all.map(t=>t.category||'general'));
+  const chips=[`<button type="button" class="catchip" data-cat="all" aria-pressed="${S.cat==='all'}">כל התחומים</button>`]
+    .concat(CATS.filter(c=>used.has(c.id)||S.cat===c.id).map(c=>`<button type="button" class="catchip" data-cat="${c.id}" aria-pressed="${S.cat===c.id}" style="--c:var(--cat-${c.id})"><i class="dot"></i>${esc(c.name)}</button>`)).join('');
+  const cb=$('#catbar'); const h2= used.size>1||S.cat!=='all'? chips:''; if(cb.dataset.h!==h2){ cb.innerHTML=h2; cb.dataset.h=h2 }
+  const people=[...new Set(all.map(t=>(t.assignee||'').trim()).filter(Boolean).concat(S.myName?[S.myName]:[]))];
+  const dl=people.map(p=>`<option value="${esc(p)}"></option>`).join(''); const dlist=$('#people'); if(dlist.dataset.h!==dl){ dlist.innerHTML=dl; dlist.dataset.h=dl }
+}
+
+function renderNotices(){
+  let h='';
+  if(S.noDb) h+=`<div class="notice">לא הצלחנו להתחבר לרשימה המשותפת. בדקו את החיבור לאינטרנט ורעננו את הדף.</div>`;
+  else if(S.demo) h+=`<div class="notice"><b>מצב הדגמה.</b> המשימות נשמרות רק במכשיר הזה עד שיוגדר החיבור ל-Firebase בקובץ firebase-config.js.</div>`;
+  const all=[...S.tasks.values()];
+  if(all.length>=3 && all.every(t=>t.done)) h+=`<div class="allset">${I.party}<span>כל המשימות בוצעו. אפשר לפתוח את הדלת!</span></div>`;
+  const el=$('#notices'); if(el.dataset.h!==h){ el.innerHTML=h; el.dataset.h=h }
+  $('#composer').hidden = S.readOnly || S.noDb;
+}
+
+function renderMain(){
+  renderNotices();
+  const main=$('#main');
+  if(!S.ready && !S.noDb){ if(!main.dataset.loading){ main.innerHTML=`<div class="empty"><h3>טוען את הרשימה…</h3><p>המשימות של כולם יופיעו כאן בעוד רגע.</p></div>`; main.dataset.loading='1' } return }
+  delete main.dataset.loading;
+  if(S.tasks.size===0){
+    const h=`<div class="empty" data-key="empty"><h3>עוד אין משימות</h3><p>כתבו למעלה את המשימה הראשונה לפתיחת החנות. כל מי שיש לו את הקישור יראה אותה מיד.</p>${S.readOnly||S.noDb?'':'<button class="btn ghost" type="button" data-act="starter">הוספת רשימה מוצעת לפתיחת חנות</button>'}</div>`;
+    if(main.dataset.h!==h){ main.innerHTML=h; main.dataset.h=h } return;
+  }
+  delete main.dataset.h;
+  if(!main.querySelector('#sec-open')){
+    main.innerHTML=`<div id="sec-open"><h2 class="section-h" id="h-open"></h2><div class="list" id="list-open"></div></div><div id="sec-done"><h2 class="section-h" id="h-done"></h2><div class="list" id="list-done"></div></div>`;
+  }
+  const vis=visible();
+  const open=vis.filter(t=>!t.done).sort(byOpen), done=vis.filter(t=>t.done).sort(byDone);
+  const showOpen = S.filter!=='done', showDoneSec = S.filter==='done' || S.filter==='all' || S.filter==='mine';
+  $('#sec-open').hidden=!showOpen; $('#sec-done').hidden=!showDoneSec;
+  $('#h-open').innerHTML = `לביצוע <small>${open.length}</small>`;
+  $('#h-done').innerHTML = `בוצעו <small>${done.length}</small>`+(S.filter==='done'?'':`<button class="linkbtn" type="button" data-act="toggle-done">${S.showDone?'הסתרה':'הצגה'}</button>`);
+  reconcile($('#list-open'), showOpen? open:[], open.length? null : emptyFiltered('open'));
+  reconcile($('#list-done'), showDoneSec && (S.showDone||S.filter==='done')? done:[], done.length||!(S.filter==='done')? null : emptyFiltered('done'));
+  S.ready && vis.forEach(t=>S.seen.add(t.id));
+}
+function emptyFiltered(which){
+  if(S.q) return 'אין משימות שמתאימות לחיפוש.';
+  if(S.filter==='mine') return S.myName? `אין משימות פתוחות על השם ${S.myName}. בחרו משימה ולחצו "אני על זה".` : 'כתבו את השם שלכם למעלה כדי לראות את המשימות שלכם.';
+  if(which==='done') return 'עוד לא סומנו משימות כבוצעו.';
+  return 'כל המשימות כאן בוצעו. כל הכבוד!';
+}
+
+function reconcile(container, tasks, emptyMsg){
+  const active=document.activeElement; let fk=null, sel=null;
+  if(active && container.contains(active) && active.dataset.fk){ fk=active.dataset.fk; try{ sel=[active.selectionStart,active.selectionEnd] }catch(e){} }
+  const existing=new Map([...container.children].map(el=>[el.dataset.key,el]));
+  const items = tasks.map(t=>({key:t.id, html:cardHTML(t), isNew: S.ready && S.seen.size>0 && !S.seen.has(t.id)}));
+  if(!items.length && emptyMsg) items.push({key:'empty', html:`<div class="empty-cm" style="padding:8px 2px">${esc(emptyMsg)}</div>`});
+  let prev=null;
+  for(const it of items){
+    let el=existing.get(it.key);
+    if(!el || el.dataset.sig!==it.html){
+      const tp=document.createElement('template'); tp.innerHTML=it.html.trim(); const n=tp.content.firstElementChild;
+      n.dataset.key=it.key; n.dataset.sig=it.html; if(it.isNew) n.classList.add('enter');
+      n.querySelectorAll('[data-fk]').forEach(inp=>{ if(S.drafts[inp.dataset.fk]!=null){ if(inp.type==='checkbox') inp.checked=!!S.drafts[inp.dataset.fk]; else inp.value=S.drafts[inp.dataset.fk] } });
+      if(el) el.replaceWith(n); el=n;
+    }
+    existing.delete(it.key);
+    const ref = prev? prev.nextElementSibling : container.firstElementChild;
+    if(ref!==el) container.insertBefore(el, ref);
+    prev=el;
+  }
+  existing.forEach(el=>el.remove());
+  if(fk && document.activeElement!==active){
+    const t=container.querySelector(`[data-fk="${CSS.escape(fk)}"]`);
+    if(t){ t.focus(); if(sel) try{ t.setSelectionRange(sel[0],sel[1]) }catch(e){} }
+  }
+}
+
+function cardHTML(t){
+  const cat=CAT[t.category]||CAT.general, cms=(S.comments.get(t.id)||[]), ro=S.readOnly||!S.db;
+  const style=`style="--c:var(--cat-${cat.id})"`;
+  if(S.editing===t.id) return `<article class="task" ${style}><form class="edit" data-form="edit" data-id="${t.id}" autocomplete="off">
+      <input class="ttl-in" data-fk="e:title" type="text" maxlength="200" aria-label="שם המשימה">
+      <div class="row">
+        <label class="field">מבצע/ת <input data-fk="e:who" type="text" list="people" maxlength="40" placeholder="מי?"></label>
+        <label class="field">תחום <select data-fk="e:cat">${CATS.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('')}</select></label>
+        <label class="field">עד <input data-fk="e:due" type="date"></label>
+        <label class="urgent-toggle"><input data-fk="e:urgent" type="checkbox"> דחוף</label>
+      </div>
+      <div class="row"><button class="btn small" type="submit">שמירה</button><button class="btn ghost small" type="button" data-act="cancel-edit">ביטול</button></div>
+    </form></article>`;
+  const n=daysTo(t.due);
+  let due='';
+  if(t.due && !t.done){ const cls=n<0?'late':n<=2?'soon':''; const lbl=n<0?`באיחור · ${fmtDay(t.due)}`:n===0?'היום':n===1?'מחר':`עד ${fmtDay(t.due)}`; due=`<span class="pill ${cls}">${I.cal}<span>${esc(lbl)}</span></span>` }
+  const who = t.assignee? `<button type="button" class="pill who" data-act="edit" title="שינוי מבצע">${I.user}<span>${esc(t.assignee)}</span></button>`
+                        : `<button type="button" class="pill who none" data-act="edit" ${ro?'disabled':''}>${I.user}<span>אין מבצע עדיין</span></button>`;
+  const donep = t.done? `<span class="pill donepill">${I.check}<span>בוצע${t.doneBy?' ע״י '+esc(t.doneBy):''}${t.doneAt?' · '+esc(ago(t.doneAt)):''}</span></span>`:'';
+  const isOpen=S.open.has(t.id);
+  const acts = `<div class="actions">
+      <button type="button" class="act" data-act="comments" aria-expanded="${isOpen}">${I.chat}הערות${cms.length?`<span class="count">${cms.length}</span>`:''}</button>
+      ${!ro && !t.done && !isMine(t)? `<button type="button" class="act claim" data-act="claim">${I.hand}אני על זה</button>`:''}
+      ${ro?'':`<button type="button" class="act" data-act="edit">${I.edit}עריכה</button><button type="button" class="act del" data-act="delete">${I.trash}מחיקה</button>`}
+    </div>`;
+  const comments = isOpen? `<div class="comments">
+      ${cms.length? cms.map(c=>`<div class="cm"><div class="cm-h"><b>${esc(c.author||'מישהו')}</b><span>${esc(ago(c.createdAt))}</span>${!ro&&((S.myId&&c.authorId===S.myId)||(!c.authorId&&S.myName&&norm(c.author)===norm(S.myName)))?`<button type="button" data-act="del-cm" data-cid="${c.id}">מחיקה</button>`:''}</div><p>${esc(c.text)}</p></div>`).join('') : '<div class="empty-cm">אין עדיין הערות למשימה הזו.</div>'}
+      ${ro?'':`<form class="cm-form" data-form="comment" data-id="${t.id}" autocomplete="off"><input data-fk="c:${t.id}" type="text" maxlength="1000" placeholder="הוספת הערה…" aria-label="הערה חדשה"><button class="btn small" type="submit">שליחה</button></form>`}
+    </div>`:'';
+  return `<article class="task${t.done?' is-done':''}" ${style} data-id="${t.id}">
+    <input class="check" type="checkbox" data-act="toggle" ${t.done?'checked':''} ${ro?'disabled':''} aria-label="${t.done?'סימון כלא בוצע':'סימון כבוצע'}">
+    <div class="tbody">
+      <div class="ttl">${esc(t.title)}</div>
+      <div class="meta">${who}<span class="pill cat"><i class="dot"></i><span>${esc(cat.name)}</span></span>${t.urgent&&!t.done?`<span class="pill urgent">${I.flag}<span>דחוף</span></span>`:''}${due}${donep}</div>
+    </div>
+    ${acts}${comments}
+  </article>`;
+}
+
+/* ---------- interactions ---------- */
+document.addEventListener('click', async e=>{
+  const f=e.target.closest('[data-filter]'); if(f){ S.filter=f.dataset.filter; ls.set('filter',S.filter); render(); return }
+  const c=e.target.closest('[data-cat]'); if(c){ S.cat=c.dataset.cat; render(); return }
+  const a=e.target.closest('[data-act]'); if(!a) return;
+  const act=a.dataset.act, card=a.closest('[data-id]'), id=card&&card.dataset.id, t=id&&S.tasks.get(id);
+  if(act==='toggle') return; // handled on change
+  if(act==='pick-date'){ S.pickDate=true; renderHeader(); return }
+  if(act==='cancel-date'){ S.pickDate=false; renderHeader(); return }
+  if(act==='toggle-done'){ S.showDone=!S.showDone; ls.set('showDone',S.showDone?'1':'0'); render(); return }
+  if(act==='starter'){
+    await write(async()=>{ const now=Date.now(); for(let i=0;i<STARTER.length;i++){ const [title,category]=STARTER[i];
+      await tasksCol().doc().set({title,category,assignee:'',due:'',urgent:false,done:false,doneBy:'',doneAt:0,createdAt:now+i,createdBy:S.myName||''}) } }, 'נוספו '+STARTER.length+' משימות. אפשר לערוך ולמחוק כל אחת.');
+    return;
+  }
+  if(act==='cancel-edit'){ S.editing=null; render(); return }
+  if(!t) return;
+  if(act==='comments'){ S.open.has(id)?S.open.delete(id):S.open.add(id); render();
+    if(S.open.has(id)){ const inp=document.querySelector(`[data-fk="c:${CSS.escape(id)}"]`); inp&&inp.focus({preventScroll:true}) } return }
+  if(act==='claim'){ if(needName()) return; await write(()=>tasksCol().doc(id).update({assignee:S.myName}), 'המשימה על השם שלך'); return }
+  if(act==='edit'){ if(S.readOnly||!S.db) return; S.editing=id;
+    Object.assign(S.drafts,{'e:title':t.title||'','e:who':t.assignee||'','e:cat':t.category||'general','e:due':t.due||'','e:urgent':!!t.urgent});
+    render(); const inp=document.querySelector('[data-fk="e:title"]'); inp&&inp.focus(); return }
+  if(act==='delete'){
+    const cms=(S.comments.get(id)||[]).slice(); const body={...t}; delete body.id;
+    const ok=await write(async()=>{ await tasksCol().doc(id).delete(); for(const cm of cms) await commentsCol().doc(cm.id).delete() });
+    if(ok) toast('המשימה נמחקה', ()=>write(async()=>{ await tasksCol().doc(id).set(body); for(const cm of cms){ const b={...cm}; delete b.id; await commentsCol().doc(cm.id).set(b) } }, 'המשימה שוחזרה'));
+    return;
+  }
+  if(act==='del-cm'){ await write(()=>commentsCol().doc(a.dataset.cid).delete(), 'ההערה נמחקה'); return }
+});
+
+document.addEventListener('change', async e=>{
+  const el=e.target;
+  if(el.dataset.fk){ S.drafts[el.dataset.fk]= el.type==='checkbox'? el.checked : el.value }
+  if(el.dataset.act!=='toggle') return;
+  const id=el.closest('[data-id]').dataset.id, done=el.checked;
+  const ok=await write(()=>tasksCol().doc(id).update(done? {done:true,doneBy:S.myName||'',doneAt:Date.now()} : {done:false,doneBy:'',doneAt:0}), done?'כל הכבוד! המשימה בוצעה':'המשימה חזרה לביצוע');
+  if(!ok) el.checked=!done;
+});
+document.addEventListener('input', e=>{ const el=e.target; if(el.dataset.fk && el.type!=='checkbox') S.drafts[el.dataset.fk]=el.value });
+
+document.addEventListener('submit', async e=>{
+  const form=e.target.closest('[data-form]'); if(!form) return; e.preventDefault();
+  const id=form.dataset.id;
+  if(form.dataset.form==='comment'){
+    if(needName()) return;
+    const inp=form.querySelector('input'), text=inp.value.trim(); if(!text) return;
+    const ok=await write(()=>commentsCol().doc().set({taskId:id,text,author:S.myName,authorId:S.myId||'',createdAt:Date.now()}));
+    if(ok){ delete S.drafts['c:'+id]; const cur=document.querySelector(`[data-fk="c:${CSS.escape(id)}"]`); if(cur){ cur.value=''; cur.focus() } }
+  }
+  if(form.dataset.form==='edit'){
+    const g=k=>form.querySelector(`[data-fk="${k}"]`);
+    const title=g('e:title').value.trim(); if(!title){ g('e:title').focus(); return }
+    const patch={title,assignee:g('e:who').value.trim(),category:g('e:cat').value,due:g('e:due').value||'',urgent:g('e:urgent').checked};
+    const ok=await write(()=>tasksCol().doc(id).update(patch), 'השינויים נשמרו');
+    if(ok){ S.editing=null; ['e:title','e:who','e:cat','e:due','e:urgent'].forEach(k=>delete S.drafts[k]); render() }
+  }
+});
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && S.editing){ S.editing=null; render() } });
+addEventListener('scroll',()=>{ const t=$('#top'); if(scrollY>80) t.classList.add('scrolled'); else if(scrollY<10) t.classList.remove('scrolled') },{passive:true});
+setInterval(()=>{ if(!document.hidden) render() }, 60000); // refresh "x minutes ago" labels
+
+/* ---------- boot ---------- */
+$('#logo-img').src=LOGO_SRC;
+S.myId = ls.get('deviceId'); if(!S.myId){ S.myId='d'+Math.random().toString(36).slice(2,12); ls.set('deviceId',S.myId) }
+render();
+
+/* Local stand-in with the same calls the app uses, for when Firebase is not configured yet. */
+function localDb(){
+  const KEY='alina-demo', subs=new Set();
+  const load=()=>{ try{ return JSON.parse(localStorage.getItem(KEY))||{} }catch(e){ return {} } };
+  let data=load();
+  const save=()=>{ try{ localStorage.setItem(KEY,JSON.stringify(data)) }catch(e){} subs.forEach(f=>f()) };
+  const snapDoc=(id,v)=>({id,exists:v!==undefined,data:()=>v});
+  const docRef=(col,id)=>({
+    set:async v=>{ (data[col]=data[col]||{})[id]={...v}; save() },
+    update:async v=>{ const c=data[col]&&data[col][id]; if(!c) throw {code:'not-found'}; Object.assign(c,v); save() },
+    delete:async()=>{ if(data[col]) delete data[col][id]; save() },
+    onSnapshot(next){ const f=()=>next(snapDoc(id,data[col]&&data[col][id])); subs.add(f); f(); return ()=>subs.delete(f) },
+  });
+  const query=(col,ord)=>({
+    orderBy:f=>query(col,f), limit:()=>query(col,ord),
+    doc:id=>docRef(col,id||('l'+Date.now().toString(36)+Math.random().toString(36).slice(2,8))),
+    onSnapshot(next){ const f=()=>{ let docs=Object.entries(data[col]||{}).map(([id,v])=>snapDoc(id,v)); if(ord) docs.sort((a,b)=>(a.data()[ord]||0)-(b.data()[ord]||0)); next({docs}) }; subs.add(f); f(); return ()=>subs.delete(f) },
+  });
+  addEventListener('storage',e=>{ if(e.key===KEY){ data=load(); subs.forEach(f=>f()) } });
+  return { collection:c=>query(c), doc:p=>{ const [c,id]=p.split('/'); return docRef(c,id) } };
+}
+
+(function start(){
+  const cfg=window.FIREBASE_CONFIG;
+  let db=null;
+  if(cfg && cfg.projectId && !/PASTE|xxx/i.test(cfg.projectId)){
+    if(!window.firebase){ S.noDb=true; render(); return }
+    try{
+      firebase.initializeApp(cfg);
+      db=firebase.firestore();
+      db.enablePersistence({synchronizeTabs:true}).catch(()=>{});
+    }catch(e){ db=null }
+    if(!db){ S.noDb=true; render(); return }
+  } else { db=localDb(); S.demo=true }
+  S.db=db;
+  let gotT=false;
+  const onErr=e=>{ toast(e&&e.code==='permission-denied'? 'אין הרשאה לקרוא את הרשימה. בדקו את הגדרות ההרשאות ב-Firebase.' : 'החיבור לרשימה נקטע. רעננו את הדף.') };
+  db.collection('tasks').limit(1000).onSnapshot(snap=>{
+    S.tasks=new Map(snap.docs.map(d=>[d.id,{id:d.id,...d.data()}]));
+    if(!gotT){ gotT=true; S.tasks.forEach((_,k)=>S.seen.add(k)) }
+    if(S.editing && !S.tasks.has(S.editing)) S.editing=null;
+    S.ready=true; render();
+  }, onErr);
+  db.collection('comments').orderBy('createdAt').limit(1000).onSnapshot(snap=>{
+    const m=new Map(); snap.docs.forEach(d=>{ const c={id:d.id,...d.data()}; if(!m.has(c.taskId)) m.set(c.taskId,[]); m.get(c.taskId).push(c) });
+    S.comments=m; render();
+  }, onErr);
+  db.doc('meta/settings').onSnapshot(s=>{ S.settings=s.exists? {...s.data()} : {}; renderHeader() }, onErr);
+})();
+})();
+</script>
+
+</body>
+</html>
